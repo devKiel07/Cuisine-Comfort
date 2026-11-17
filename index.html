@@ -268,6 +268,162 @@ svg.icon,svg.nav-icon,svg.cart-icon,svg.empty-icon,.category-icon svg,.mobile-me
   .body h3{font-size:.88rem}
   .body p{font-size:.72rem}
 }
+
+/* ===== Responsive refinements: phones, tablets, small laptops and wide screens ===== */
+html, body { width:100%; max-width:100%; overflow-x:clip; }
+img, svg { max-width:100%; }
+button, a, input { -webkit-tap-highlight-color:transparent; }
+button, .tab, .bnav a, .bnav button { touch-action:manipulation; }
+
+@media (min-width:641px) and (max-width:960px) {
+  header {
+    grid-template-columns:auto minmax(0,1fr);
+    gap:12px 18px;
+    padding:12px 3vw;
+  }
+  header nav { justify-self:end; gap:14px; }
+  .brand img { width:112px; height:64px; }
+  .search { width:min(560px,100%); }
+  .hwrap { height:clamp(340px,48vw,440px); }
+  .copy { width:min(54%,500px); }
+  main { padding-left:3vw; padding-right:3vw; }
+  .grid { grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); }
+  .footer-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:28px; }
+}
+
+@media (max-width:640px) {
+  header {
+    grid-template-columns:40px minmax(0,1fr) auto;
+    grid-template-rows:auto auto;
+    gap:9px 8px;
+    padding:9px max(12px,env(safe-area-inset-right,0px)) 10px max(12px,env(safe-area-inset-left,0px));
+  }
+  .mobile-menu-toggle, header nav a.admin-link, .cartbtn {
+    width:38px; height:38px; min-width:38px;
+  }
+  .brand { min-width:0; }
+  .brand img { width:clamp(84px,25vw,108px); height:54px; }
+  header nav { min-width:0; gap:6px; }
+  .search { min-width:0; }
+  .search input { min-width:0; width:100%; font-size:16px; }
+  .hero, main { min-width:0; }
+  .hwrap { width:100%; height:clamp(270px,78vw,370px); }
+  .copy { left:clamp(15px,5vw,24px); right:14px; bottom:clamp(18px,5vw,28px); }
+  .hero h1 { font-size:clamp(1.65rem,7.4vw,2.55rem); overflow-wrap:anywhere; }
+  .copy .lead { max-width:34ch; font-size:clamp(.82rem,3.4vw,.95rem); }
+  .tabs {
+    justify-content:flex-start;
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    scroll-snap-type:x proximity;
+    gap:clamp(8px,2.4vw,14px);
+    padding:8px 3px 14px;
+  }
+  .tab { scroll-snap-align:start; flex:0 0 58px; }
+  .category-icon { width:clamp(42px,12vw,50px); height:clamp(42px,12vw,50px); }
+  .category-icon svg { width:23px; height:23px; }
+  .grid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:clamp(8px,2.5vw,13px);
+  }
+  .card { min-width:0; }
+  .pic { width:100%; min-width:0; aspect-ratio:1.25; }
+  .pic img { object-fit:cover; }
+  .body { min-width:0; padding:clamp(8px,2.5vw,12px); }
+  .body h3 { font-size:clamp(.78rem,3.2vw,.98rem); overflow-wrap:anywhere; }
+  .body p { font-size:clamp(.66rem,2.7vw,.78rem); overflow-wrap:anywhere; }
+  .rate { display:flex; align-items:center; flex-wrap:wrap; gap:3px; }
+  .rate .star { flex:0 0 12px; }
+  .price { font-size:clamp(.82rem,3.4vw,1rem); }
+  .row { min-width:0; gap:6px; }
+  .add { flex:0 0 32px; width:32px; height:32px; }
+  .bnav {
+    left:max(8px,env(safe-area-inset-left,0px));
+    right:max(8px,env(safe-area-inset-right,0px));
+    bottom:calc(8px + env(safe-area-inset-bottom,0px));
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    align-items:center;
+    gap:2px;
+    padding:7px 4px calc(7px + env(safe-area-inset-bottom,0px));
+    border-radius:20px;
+  }
+  .bnav a, .bnav button {
+    min-width:0;
+    min-height:42px;
+    justify-content:center;
+    gap:3px;
+    font-size:clamp(.58rem,2.5vw,.7rem);
+    white-space:nowrap;
+  }
+  .bnav .nav-icon { width:22px; height:22px; }
+  .bnav .mid {
+    justify-self:center;
+    width:52px; height:52px;
+    min-height:52px;
+    margin-top:-19px;
+    border-radius:50%;
+  }
+  .bnav .mid .nav-icon { width:23px; height:23px; }
+  .bnav .mid b { top:0; right:0; }
+  body { padding-bottom:calc(86px + env(safe-area-inset-bottom,0px)); }
+  .promo { gap:8px; }
+  .promo h3 { max-width:min(58%,260px); overflow-wrap:anywhere; }
+  footer#visit { padding-left:18px; padding-right:18px; }
+  .footer-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .footer-column, .footer-brand { min-width:0; }
+  .footer-column a { max-width:100%; overflow-wrap:anywhere; }
+  .footer-bottom { min-width:0; overflow-wrap:anywhere; }
+  aside { width:min(100%,460px); }
+  .dh, .items, .foot { padding-left:16px; padding-right:16px; }
+  .line { min-width:0; gap:8px; }
+  .line .n { min-width:0; overflow-wrap:anywhere; }
+  .qty { flex:0 0 auto; gap:5px; }
+}
+
+@media (max-width:380px) {
+  header { grid-template-columns:34px minmax(0,1fr) auto; gap:8px 5px; padding-left:10px; padding-right:10px; }
+  .mobile-menu-toggle, header nav a.admin-link, .cartbtn { width:34px; height:34px; min-width:34px; }
+  .brand img { width:82px; height:48px; }
+  .hero { padding-left:9px; padding-right:9px; }
+  .hwrap { height:285px; border-radius:18px; }
+  .copy { left:15px; right:12px; bottom:17px; }
+  .hero h1 { font-size:1.65rem; }
+  .copy .lead { font-size:.78rem; line-height:1.4; margin:8px 0 12px; }
+  .cta { padding:10px 18px; font-size:.86rem; }
+  main { padding-left:9px; padding-right:9px; }
+  .grid { gap:7px; }
+  .body { padding:7px; }
+  .body h3 { font-size:.76rem; }
+  .body p { font-size:.64rem; }
+  .rate small { font-size:.55rem; }
+  .price { font-size:.78rem; }
+  .add { width:29px; height:29px; flex-basis:29px; }
+  .promo { padding:18px 13px; }
+  .promo h3 { max-width:62%; font-size:1.25rem; }
+  .promo .cta { padding:9px 13px; font-size:.78rem; }
+  .footer-grid { gap:22px 12px; }
+  .footer-column h2 { font-size:.7rem; }
+  .footer-column a, .footer-column p, .footer-brand p { font-size:.8rem; }
+  .bnav { left:6px; right:6px; }
+}
+
+@media (max-width:340px) {
+  .bnav a, .bnav button { font-size:.55rem; }
+  .bnav .nav-icon { width:20px; height:20px; }
+  .bnav .mid { width:46px; height:46px; min-height:46px; }
+  .category-label { font-size:.59rem; }
+  .tab { flex-basis:53px; }
+  .cartbtn .cart-icon { width:18px; height:18px; }
+}
+
+/* Keep controls and icons aligned when the device is rotated or text is enlarged. */
+@media (max-height:500px) and (orientation:landscape) and (max-width:900px) {
+  .hwrap { height:300px; }
+  .bnav { position:static; margin:12px 10px; }
+  body { padding-bottom:0; }
+}
+
 </style>
 </head>
 <body>
