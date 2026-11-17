@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menu Admin | Cuisine &amp; Comfort</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+:root{color-scheme:light;--bg:#faf9f4;--surface:#fff;--ink:#183529;--muted:#6d766d;--line:#e7e8df;--gold:#c8a448;--danger:#a42d24;--shadow:0 10px 28px rgba(22,45,33,.08)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 'DM Sans',system-ui,sans-serif}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif;line-height:1.15;margin:0}
+a{color:inherit}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px max(5vw,calc((100vw - 1060px)/2));background:var(--surface);border-bottom:1px solid var(--line)}
+header img{display:block;width:104px;height:62px;object-fit:contain}
+header a{font-weight:700;text-decoration:none}
+header .back{font-size:.92rem;color:var(--muted)}
+main{width:min(1060px,90vw);margin:38px auto 80px}
+.intro{margin-bottom:22px}
+.intro p,.hint{color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:var(--shadow);margin:18px 0}
+.panel h2{margin-bottom:14px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+label{display:grid;gap:6px;font-weight:700;font-size:.9rem}
+label.wide{grid-column:1/-1}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--ink);padding:11px 12px}
+textarea{resize:vertical;min-height:84px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.btn{border:0;border-radius:11px;padding:10px 16px;background:var(--ink);color:#fff;font-weight:700}
+.btn.secondary{background:#edf0e9;color:var(--ink)}
+.btn.danger{background:#fff0ed;color:var(--danger)}
+.btn:disabled{opacity:.55;cursor:wait}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.status{padding:10px 12px;border-radius:10px;background:#eef3eb;color:#254d35}
+.status.error{background:#fff0ed;color:var(--danger)}
+.status:empty{display:none}
+.hint{font-size:.9rem;margin:10px 0 0}
+.menu-list{display:grid;gap:10px}
+.menu-item{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:14px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px}
+.menu-item img,.placeholder{width:76px;height:66px;object-fit:cover;border-radius:9px;background:#f0f0e9}
+.menu-item h3{font-family:'DM Sans',sans-serif;font-size:1rem}
+.menu-item p{margin:3px 0;color:var(--muted);font-size:.85rem}
+.item-actions{display:flex;align-items:center;gap:8px}
+.price{white-space:nowrap;font-weight:700}
+.empty{padding:24px;text-align:center;color:var(--muted)}
+[hidden]{display:none!important}
+@media(max-width:640px){header{padding:8px 14px}header img{width:88px;height:54px}main{width:auto;margin:24px 14px 60px}.panel{padding:18px}.form-grid{grid-template-columns:1fr}label.wide{grid-column:auto}.toolbar{align-items:flex-start;flex-direction:column}.menu-item{grid-template-columns:58px minmax(0,1fr)}.menu-item img,.placeholder{width:58px;height:58px}.item-actions{grid-column:2;justify-content:flex-start}.price{margin-right:auto}}
+</style>
+</head>
+<body>
+<header>
+  <a href="index.html" aria-label="Cuisine &amp; Comfort home"><img src="assets/cuisine-comfort-logo.png" alt="Cuisine &amp; Comfort"></a>
+  <a class="back" href="index.html">Back to menu</a>
+</header>
+<main>
+  <div class="intro"><h1>Menu admin</h1><p>Sign in to manage dishes and prices. Changes are shared with visitors through Firebase.</p></div>
+  <section class="panel" id="login-panel" aria-labelledby="login-title">
+    <h2 id="login-title">Admin sign in</h2>
+    <p class="hint">Use the verified Firebase account <strong id="admin-email-label"></strong>. Create the account in Firebase Authentication first if needed.</p>
+    <form id="login-form" class="form-grid">
+      <label>Email<input id="email" type="email" autocomplete="username" required></label>
+      <label>Password<input id="password" type="password" autocomplete="current-password" required></label>
+      <div class="actions wide"><button class="btn" type="submit">Sign in</button><button class="btn secondary" type="button" id="verify-email" hidden>Send verification email</button></div>
+    </form>
+    <p class="status" id="login-status" role="status" aria-live="polite"></p>
+  </section>
+
+  <section id="dashboard" hidden>
+    <div class="panel toolbar">
+      <div><h2>Menu items</h2><p class="hint">Add dishes, edit details and prices, or remove items.</p></div>
+      <div class="actions"><button class="btn secondary" id="seed-menu" type="button" hidden>Import starter menu</button><button class="btn secondary" id="sign-out" type="button">Sign out</button></div>
+    </div>
+    <p class="status" id="admin-status" role="status" aria-live="polite"></p>
+    <section class="panel" aria-labelledby="form-title">
+      <h2 id="form-title">Add a dish</h2>
+      <form id="menu-form">
+        <input id="item-key" type="hidden">
+        <div class="form-grid">
+          <label>Dish name<input id="item-name" maxlength="100" required></label>
+          <label>Category<select id="item-category" required><option>Snacks</option><option>Mains</option><option>Sides</option><option>Drinks</option></select></label>
+          <label>Price (GH₵)<input id="item-price" type="number" min="0.01" max="100000" step="0.01" required></label>
+          <label>Badge (optional)<input id="item-tag" maxlength="40" placeholder="Chef's pick"></label>
+          <label class="wide">Description<textarea id="item-description" maxlength="400" required></textarea></label>
+          <label class="wide">Photo path or HTTPS URL<input id="item-image" maxlength="2048" placeholder="assets/food/fried-rice-chicken.jpg"></label>
+        </div>
+        <p class="hint">For an existing site photo, use its path under <code>assets/food/</code>. External photos must use HTTPS.</p>
+        <div class="actions"><button class="btn" id="save-item" type="submit">Add dish</button><button class="btn secondary" id="cancel-edit" type="button" hidden>Cancel edit</button></div>
+      </form>
+    </section>
+    <section class="panel" aria-labelledby="list-title">
+      <h2 id="list-title">Current menu</h2>
+      <div class="menu-list" id="menu-list"><p class="empty">Loading menu…</p></div>
+    </section>
+  </section>
+</main>
+<script src="firebase-config.js"></script>
+<script type="module">
+const $ = id => document.getElementById(id);
+const emailAllowed = String(window.ADMIN_EMAIL || "").toLowerCase();
+$("admin-email-label").textContent = emailAllowed;
+$("email").value = emailAllowed;
+let auth, db, currentUser, unsubscribeMenu, menuItems = [];
+
+function showStatus(element, message, isError = false) {
+  element.textContent = message;
+  element.classList.toggle("error", isError);
+}
+
+function safePhoto(value) {
+  const src = String(value || "").trim();
+  if (/^assets\/food\/[a-z0-9._/-]+$/i.test(src) && !src.split("/").includes("..")) return src;
+  if (/^https:\/\/[^\s"'<>]+$/i.test(src)) return src;
+  return "";
+}
+
+function slugify(value) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+}
+
+function setEditing(item) {
+  $("item-key").value = item ? item.k : "";
+  $("item-name").value = item ? item.n : "";
+  $("item-category").value = item ? item.c : "Mains";
+  $("item-price").value = item ? item.p : "";
+  $("item-tag").value = item && item.t ? item.t : "";
+  $("item-description").value = item ? item.d : "";
+  $("item-image").value = item ? (item.image || "") : "";
+  $("form-title").textContent = item ? "Edit dish" : "Add a dish";
+  $("save-item").textContent = item ? "Save changes" : "Add dish";
+  $("cancel-edit").hidden = !item;
+  if (item) $("item-name").focus();
+}
+
+function renderMenu() {
+  const list = $("menu-list");
+  list.replaceChildren();
+  $("seed-menu").hidden = menuItems.length > 0;
+  if (!menuItems.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty";
+    empty.textContent = "No menu items are saved in Firestore yet. Import the starter menu to publish the current dishes, or add your first dish.";
+    list.append(empty);
+    return;
+  }
+  for (const item of menuItems) {
+    const row = document.createElement("article");
+    row.className = "menu-item";
+    const imageSrc = safePhoto(item.image);
+    if (imageSrc) {
+      const image = document.createElement("img");
+      image.src = imageSrc;
+      image.alt = "";
+      image.loading = "lazy";
+      row.append(image);
+    } else {
+      const placeholder = document.createElement("div");
+      placeholder.className = "placeholder";
+      placeholder.setAttribute("aria-hidden", "true");
+      row.append(placeholder);
+    }
+    const details = document.createElement("div");
+    const name = document.createElement("h3");
+    name.textContent = item.n;
+    const description = document.createElement("p");
+    description.textContent = `${item.c} · ${item.d}`;
+    details.append(name, description);
+    const actions = document.createElement("div");
+    actions.className = "item-actions";
+    const price = document.createElement("span");
+    price.className = "price";
+    price.textContent = `GH₵${Number(item.p).toFixed(2)}`;
+    const edit = document.createElement("button");
+    edit.className = "btn secondary";
+    edit.type = "button";
+    edit.dataset.action = "edit";
+    edit.dataset.key = item.k;
+    edit.textContent = "Edit";
+    const remove = document.createElement("button");
+    remove.className = "btn danger";
+    remove.type = "button";
+    remove.dataset.action = "delete";
+    remove.dataset.key = item.k;
+    remove.textContent = "Delete";
+    actions.append(price, edit, remove);
+    row.append(details, actions);
+    list.append(row);
+  }
+}
+
+function friendlyError(error) {
+  console.error("Firebase admin operation failed:", error);
+  return error && error.message ? error.message : "The request failed. Check Firebase setup and try again.";
+}
+
+function watchMenu({ collection, onSnapshot }) {
+  if (unsubscribeMenu) unsubscribeMenu();
+  unsubscribeMenu = onSnapshot(collection(db, "menu"), snapshot => {
+    menuItems = snapshot.docs.map(itemDoc => ({ ...itemDoc.data(), k: itemDoc.id }))
+      .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0));
+    renderMenu();
+    showStatus($("admin-status"), snapshot.empty ? "Firestore is connected. Import or add menu items to publish them." : "Menu is connected and up to date.");
+  }, error => showStatus($("admin-status"), friendlyError(error), true));
+}
+
+try {
+  const version = "https://www.gstatic.com/firebasejs/13.4.0/";
+  const [appSdk, authSdk, firestoreSdk] = await Promise.all([
+    import(`${version}firebase-app.js`),
+    import(`${version}firebase-auth.js`),
+    import(`${version}firebase-firestore.js`)
+  ]);
+  const app = appSdk.initializeApp(window.FIREBASE_CONFIG);
+  auth = authSdk.getAuth(app);
+  db = firestoreSdk.getFirestore(app);
+
+  $("login-form").addEventListener("submit", async event => {
+    event.preventDefault();
+    showStatus($("login-status"), "Signing in…");
+    try {
+      await authSdk.signInWithEmailAndPassword(auth, $("email").value.trim(), $("password").value);
+      $("password").value = "";
+    } catch (error) {
+      showStatus($("login-status"), friendlyError(error), true);
+    }
+  });
+
+  $("verify-email").addEventListener("click", async () => {
+    try {
+      await authSdk.sendEmailVerification(currentUser);
+      showStatus($("login-status"), "Verification email sent. Verify the address, then sign in again.");
+    } catch (error) {
+      showStatus($("login-status"), friendlyError(error), true);
+    }
+  });
+
+  $("sign-out").addEventListener("click", () => authSdk.signOut(auth));
+
+  authSdk.onAuthStateChanged(auth, async user => {
+    currentUser = user;
+    const authorized = Boolean(user && user.email && user.email.toLowerCase() === emailAllowed && user.emailVerified);
+    $("login-panel").hidden = authorized;
+    $("dashboard").hidden = !authorized;
+    $("verify-email").hidden = true;
+    if (!user) {
+      if (unsubscribeMenu) unsubscribeMenu();
+      unsubscribeMenu = null;
+      return;
+    }
+    if (!user.email || user.email.toLowerCase() !== emailAllowed) {
+      showStatus($("login-status"), `This account is not authorized. Sign in as ${emailAllowed}.`, true);
+      await authSdk.signOut(auth);
+      return;
+    }
+    if (!user.emailVerified) {
+      $("verify-email").hidden = false;
+      showStatus($("login-status"), "Verify this admin email before editing the menu.", true);
+      return;
+    }
+    watchMenu(firestoreSdk);
+  });
+
+  $("menu-form").addEventListener("submit", async event => {
+    event.preventDefault();
+    const originalKey = $("item-key").value;
+    const name = $("item-name").value.trim();
+    const key = originalKey || slugify(name);
+    const price = Number($("item-price").value);
+    const image = safePhoto($("item-image").value);
+    if (!key || !name || !Number.isFinite(price) || price <= 0) {
+      showStatus($("admin-status"), "Enter a dish name and a valid price greater than zero.", true);
+      return;
+    }
+    if ($("item-image").value.trim() && !image) {
+      showStatus($("admin-status"), "Use a path under assets/food/ or a valid HTTPS image URL.", true);
+      return;
+    }
+    const currentItem = menuItems.find(item => item.k === originalKey);
+    const data = {
+      c: $("item-category").value,
+      k: key,
+      n: name,
+      d: $("item-description").value.trim(),
+      p: price,
+      image,
+      sortOrder: currentItem ? Number(currentItem.sortOrder || 0) : Date.now()
+    };
+    const tag = $("item-tag").value.trim();
+    if (tag) data.t = tag;
+    const saveButton = $("save-item");
+    saveButton.disabled = true;
+    try {
+      const itemRef = firestoreSdk.doc(db, "menu", key);
+      if (!originalKey && (await firestoreSdk.getDoc(itemRef)).exists()) {
+        throw new Error("A dish with this name already exists. Edit the existing item instead.");
+      }
+      await firestoreSdk.setDoc(itemRef, data);
+      setEditing(null);
+      showStatus($("admin-status"), "Menu item saved.");
+    } catch (error) {
+      showStatus($("admin-status"), friendlyError(error), true);
+    } finally {
+      saveButton.disabled = false;
+    }
+  });
+
+  $("cancel-edit").addEventListener("click", () => setEditing(null));
+
+  $("menu-list").addEventListener("click", async event => {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
+    const item = menuItems.find(menuItem => menuItem.k === button.dataset.key);
+    if (!item) return;
+    if (button.dataset.action === "edit") {
+      setEditing(item);
+      return;
+    }
+    if (button.dataset.action === "delete" && window.confirm(`Remove ${item.n} from the menu?`)) {
+      try {
+        await firestoreSdk.deleteDoc(firestoreSdk.doc(db, "menu", item.k));
+        showStatus($("admin-status"), "Menu item removed.");
+      } catch (error) {
+        showStatus($("admin-status"), friendlyError(error), true);
+      }
+    }
+  });
+
+  $("seed-menu").addEventListener("click", async () => {
+    const button = $("seed-menu");
+    button.disabled = true;
+    try {
+      const response = await fetch("assets/menu-seed.json");
+      if (!response.ok) throw new Error(`Could not load the starter menu (${response.status}).`);
+      const seedItems = await response.json();
+      const batch = firestoreSdk.writeBatch(db);
+      for (const item of seedItems) batch.set(firestoreSdk.doc(db, "menu", item.k), item);
+      await batch.commit();
+      showStatus($("admin-status"), "Starter menu imported.");
+    } catch (error) {
+      showStatus($("admin-status"), friendlyError(error), true);
+    } finally {
+      button.disabled = false;
+    }
+  });
+} catch (error) {
+  showStatus($("login-status"), `Firebase could not initialize: ${friendlyError(error)}`, true);
+}
+</script>
+</body>
+</html>

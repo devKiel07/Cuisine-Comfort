@@ -1,0 +1,17 @@
+[
+  {"c":"Snacks","k":"kelewele","n":"Kelewele","d":"Spicy ginger-and-pepper fried ripe plantain.","p":20,"t":"Vegan","image":"assets/food/kelewele.jpg","sortOrder":1},
+  {"c":"Snacks","k":"bofrot","n":"Bofrot","d":"Soft, golden Ghanaian doughnuts, lightly sugared.","p":15,"t":"Vegetarian","image":"assets/food/bofrot.webp","sortOrder":2},
+  {"c":"Snacks","k":"khebab","n":"Chicken Khebab","d":"Suya-spiced grilled skewers with onions and peppers.","p":30,"image":"assets/food/ai-chicken-khebab.jpg","sortOrder":3},
+  {"c":"Mains","k":"jollof","n":"Jollof Rice & Chicken","d":"Smoky party jollof with grilled chicken and fresh salad.","p":55,"t":"Chef's pick","image":"assets/food/ai-jollof.jpg","sortOrder":4},
+  {"c":"Mains","k":"waakye","n":"Waakye Special","d":"Rice and beans with spaghetti, egg, gari and shito.","p":45,"image":"assets/food/waakye.png","sortOrder":5},
+  {"c":"Mains","k":"banku","n":"Banku & Grilled Tilapia","d":"Fermented corn banku, spiced tilapia, hot pepper sauce.","p":75,"image":"assets/food/banku-tilapia.jpg","sortOrder":6},
+  {"c":"Mains","k":"fufu","n":"Fufu & Light Soup","d":"Pounded cassava and plantain in peppery goat soup.","p":70,"image":"assets/food/fufu-light-soup.jpg","sortOrder":7},
+  {"c":"Mains","k":"redred","n":"Red Red","d":"Black-eyed bean stew with fried plantain and gari.","p":40,"t":"Vegan option","image":"assets/food/red-red.webp","sortOrder":8},
+  {"c":"Mains","k":"kenkey","n":"Kenkey & Fried Fish","d":"Ga kenkey, crispy fried fish, shito and pepper.","p":45,"image":"assets/food/kenkey-fried-fish.jpg","sortOrder":9},
+  {"c":"Mains","k":"friedrice","n":"Fried Rice & Chicken","d":"Veggie fried rice with crispy chicken.","p":55,"image":"assets/food/fried-rice-chicken.jpg","sortOrder":10},
+  {"c":"Sides","k":"shito","n":"Shito","d":"Our house black pepper sauce, made in small batches.","p":10,"t":"Vegan","image":"assets/food/ai-shito.jpg","sortOrder":11},
+  {"c":"Sides","k":"yam","n":"Fried Yam & Shito","d":"Crispy yam wedges with a spicy dip.","p":30,"t":"Vegetarian","image":"assets/food/fried-yam-plate.jpg","sortOrder":12},
+  {"c":"Drinks","k":"sobolo","n":"Sobolo","d":"Chilled hibiscus drink with ginger and cloves.","p":12,"t":"Vegan","image":"assets/food/ai-sobolo.jpg","sortOrder":13},
+  {"c":"Drinks","k":"asaana","n":"Asaana","d":"Lightly fermented corn drink, sweet and refreshing.","p":12,"t":"Vegan","image":"assets/food/ai-asaana.jpg","sortOrder":14},
+  {"c":"Drinks","k":"ginger","n":"Ginger Drink","d":"Fresh, fiery ginger with a squeeze of lemon.","p":12,"t":"Vegan","image":"assets/food/ai-ginger-drink.jpg","sortOrder":15}
+]
