@@ -6,4 +6,4 @@ window.FIREBASE_CONFIG = {
   messagingSenderId: "288349744792",
   appId: "1:288349744792:web:5fff40c6dc784e1dfaaaed"
 };
-window.ADMIN_EMAIL = "c&c@gmail.com";
+window.ADMIN_EMAIL = "ezekieltagoe20@gmail.com";
