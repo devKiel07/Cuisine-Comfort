@@ -18,6 +18,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;justify-content:space-between;padding:10px 5vw;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .brand{font-family:'Fraunces',serif;font-weight:800;font-size:1.25rem;color:var(--ink);text-decoration:none}.brand span{color:var(--orange)}
 nav{display:flex;gap:22px;align-items:center}nav a{color:var(--muted);text-decoration:none;font-weight:500}nav a:hover{color:var(--orange)}
+header nav .admin-link{display:flex;align-items:center;gap:7px;color:var(--ink);font-weight:700;text-decoration:none;padding:8px 10px;border:1px solid var(--line);border-radius:12px}
+header nav .admin-link:hover{background:var(--tile);color:var(--leaf)}
+header nav .admin-link svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .cartbtn{display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);border:0;border-radius:99px;padding:10px 18px;font-weight:700}
 .cartbtn b{background:var(--orange);color:#fff;border-radius:99px;min-width:24px;height:24px;display:grid;place-items:center;font-size:.8rem}
 .cartbtn.bump{animation:bump .4s}@keyframes bump{40%{transform:scale(1.15)}}
@@ -70,7 +73,6 @@ input{width:100%;font:inherit;padding:11px 14px;border:1.5px solid var(--line);b
 .done .chk{width:90px;height:90px;border-radius:50%;background:var(--leaf);display:grid;place-items:center}
 .chk svg{width:48px;stroke:#fff;stroke-width:5;fill:none;stroke-dasharray:50;stroke-dashoffset:50;animation:draw .6s .2s forwards}@keyframes draw{to{stroke-dashoffset:0}}
 .done h2{font-size:2rem}.done p{color:var(--muted);margin:0 0 10px}
-footer{text-align:center;padding:30px 5vw 40px;color:var(--muted);border-top:1px solid var(--line);font-size:.92rem}
 @media(max-width:640px){nav a{display:none}.hero{padding-bottom:50px}.grid{grid-template-columns:1fr}.card{flex-direction:row}.pic{height:auto;width:100px;flex:none}.pic svg{width:90px;height:90px}.body{padding:12px 14px}}
 @media(prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition:none!important}}
 
@@ -167,11 +169,20 @@ main{max-width:1180px;padding:4px 5vw 84px}
 .promo h3{max-width:470px;color:#fff}
 .promo .cta{background:#d7b85b}
 .promo .pv{display:none}
-footer{background:#f3f2eb;color:var(--muted);font-size:.85rem}
-.photo-credits{max-width:800px;margin:20px auto 0;text-align:left;font-size:.78rem}
-.photo-credits summary{cursor:pointer;color:var(--ink);font-weight:700}
-.photo-credits p{line-height:1.65}
-.photo-credits a{color:var(--leaf)}
+footer#visit{background:#183529;color:#f4f2e9;font-size:.9rem;text-align:left;padding:48px max(5vw,calc((100vw - 1180px)/2)) 20px;border:0}
+.footer-grid{display:grid;grid-template-columns:1.35fr .8fr 1.15fr .8fr;gap:36px;max-width:1180px;margin:0 auto;padding-bottom:34px}
+.footer-brand-name{display:inline-block;color:#fff;text-decoration:none;font:800 1.45rem/1.2 'Fraunces',Georgia,serif}
+.footer-brand-name span{color:#e4c36e}
+.footer-brand p,.footer-column p{max-width:270px;margin:12px 0 0;color:rgba(244,242,233,.76);line-height:1.65}
+.footer-column h2{margin:0 0 14px;color:#e4c36e;font:700 .78rem/1.3 'DM Sans',system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.footer-column a{display:flex;align-items:center;gap:9px;width:fit-content;margin-top:10px;color:#f4f2e9;text-decoration:none;overflow-wrap:anywhere}
+.footer-column a:hover,.footer-bottom a:hover{color:#e4c36e}
+.footer-column svg{width:17px;height:17px;flex:none;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.footer-location{display:flex;align-items:flex-start;gap:9px}
+.footer-location svg{margin-top:3px}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;gap:16px;max-width:1180px;margin:0 auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.16);color:rgba(244,242,233,.68);font-size:.8rem}
+.footer-bottom p{margin:0}
+.footer-bottom a{color:#f4f2e9;text-decoration:none;font-weight:700}
 .bnav{background:rgba(255,255,255,.96);border-color:var(--line)}
 .bnav a,.bnav button{color:var(--muted)}
 .bnav .mid{background:var(--ink);color:#fff}
@@ -180,8 +191,10 @@ footer{background:#f3f2eb;color:var(--muted);font-size:.85rem}
   header{position:sticky;grid-template-columns:1fr;gap:10px;padding:10px 14px}
   .brand{grid-column:1;justify-self:center}
   .brand img{width:104px;height:62px}
-  header nav{position:absolute;right:14px;top:11px;gap:0}
+  header nav{position:absolute;right:14px;top:11px;gap:8px}
   header nav a{display:none}
+  header nav a.admin-link{display:grid;place-items:center;width:36px;height:36px;padding:0}
+  .admin-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   .cartbtn{position:relative;display:grid;place-items:center;width:36px;height:36px;padding:0;font-size:0}
   .cartbtn .cart-icon{width:20px;height:20px}
   .cartbtn b{position:absolute;top:-4px;right:-5px;min-width:19px;height:19px;font-size:.62rem}
@@ -215,7 +228,10 @@ footer{background:#f3f2eb;color:var(--muted);font-size:.85rem}
   .promo::after{left:38%;background-position:58% center}
   .promo h3{max-width:210px;font-size:1.55rem}
   .promo .cta{padding:10px 18px;font-size:.85rem}
-  .photo-credits{padding:0 14px}
+  footer#visit{padding:36px 20px 18px}
+  .footer-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 18px;padding-bottom:26px}
+  .footer-brand{grid-column:1/-1}
+  .footer-bottom{align-items:flex-start;flex-direction:column;gap:8px}
 }
 @media(max-width:360px){
   .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -228,6 +244,7 @@ footer{background:#f3f2eb;color:var(--muted);font-size:.85rem}
 <header>
   <a class="brand" href="#top" aria-label="Cuisine &amp; Comfort home"><img src="assets/cuisine-comfort-logo.png" alt="Cuisine &amp; Comfort"></a>
   <nav><a href="#menu">Menu</a><a href="#visit">Visit us</a>
+  <a class="admin-link" href="admin.html" aria-label="Open admin dashboard" title="Admin dashboard"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3 19 6v5c0 4.5-2.7 7.7-7 10-4.3-2.3-7-5.5-7-10V6l7-3Z"/><circle cx="12" cy="10" r="2.2"/><path d="M8.2 16c.8-1.6 2.1-2.4 3.8-2.4s3 .8 3.8 2.4"/></svg><span class="admin-label">Admin</span></a>
   <button class="cartbtn" id="open" aria-label="Open your order"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.3a2 2 0 0 0 1.9-1.4L21 9H6"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span>Your order</span><b id="count">0</b></button></nav>
   <div class="search"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.8" cy="10.8" r="7"/><path d="m16 16 4.5 4.5"/></svg><input id="q" type="search" placeholder="Search for dishes, e.g. waakye, jollof..." aria-label="Search dishes"></div>
 </header>
@@ -249,10 +266,32 @@ footer{background:#f3f2eb;color:var(--muted);font-size:.85rem}
   <div class="promo"><div><small>Weekend special</small><h3>Bring a little Ghana to your table</h3><a class="cta" href="#menu">Order now</a></div><div class="pv" id="pv"></div></div>
 </main>
 
-<footer id="visit"><strong>Cuisine &amp; Comfort</strong><br>Accra, Ghana &middot; +233 20 000 0000 &middot; hello@cuisineandcomfort.example<br>Good food &middot; Great mood<br><a href="admin.html">Admin</a>
-  <details class="photo-credits"><summary>About the food photography</summary>
-    <p>Menu photos supplied for this preview are combined with generated examples. Confirm each image matches the food you serve before publishing the menu.</p>
-  </details>
+<footer id="visit">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a class="footer-brand-name" href="#top">Cuisine <span>&amp;</span> Comfort</a>
+      <p>Good food, great mood, and a warm welcome in Accra.</p>
+    </div>
+    <div class="footer-column">
+      <h2>Explore</h2>
+      <a href="#top">Home</a>
+      <a href="#menu">Our menu</a>
+    </div>
+    <div class="footer-column">
+      <h2>Contact</h2>
+      <a href="tel:+233553916228"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 3h3l1.5 4-2 1.4a14 14 0 0 0 6 6l1.4-2L21 14v3a2 2 0 0 1-2 2C10 19 5 14 5 5a2 2 0 0 1 2-2Z"/></svg>0553916228</a>
+      <a href="tel:+233240011250"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 3h3l1.5 4-2 1.4a14 14 0 0 0 6 6l1.4-2L21 14v3a2 2 0 0 1-2 2C10 19 5 14 5 5a2 2 0 0 1 2-2Z"/></svg>0240011250</a>
+      <a href="mailto:c&amp;c@gmail.com"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>c&amp;c@gmail.com</a>
+    </div>
+    <div class="footer-column">
+      <h2>Location</h2>
+      <p class="footer-location"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Accra, Ghana</span></p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; Cuisine &amp; Comfort. All rights reserved.</p>
+    <a href="#top">Back to top &uarr;</a>
+  </div>
 </footer>
 
 <nav class="bnav" aria-label="Quick navigation"><a href="#top"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Home</a><a href="#menu"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3v7m-3-7v4a3 3 0 0 0 6 0V3m-3 7v11M16 3v18m0-18c3 2 4 5 4 9h-4"/></svg>Menu</a><button id="bn-order" class="mid" aria-label="Open your order"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.3a2 2 0 0 0 1.9-1.4L21 9H6"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>Order<b id="count2">0</b></button><a href="#visit"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>Visit</a><a href="#menu" id="bn-s"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>More</a></nav>
