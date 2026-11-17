@@ -45,6 +45,7 @@ textarea{resize:vertical;min-height:84px}
 .menu-item p{margin:3px 0;color:var(--muted);font-size:.85rem}
 .item-actions{display:flex;align-items:center;gap:8px}
 .price{white-space:nowrap;font-weight:700}
+.photo-preview{display:block;width:min(100%,320px);max-height:220px;object-fit:cover;border-radius:12px;background:#f0f0e9}
 .empty{padding:24px;text-align:center;color:var(--muted)}
 [hidden]{display:none!important}
 @media(max-width:640px){header{padding:8px 14px}header img{width:88px;height:54px}main{width:auto;margin:24px 14px 60px}.panel{padding:18px}.form-grid{grid-template-columns:1fr}label.wide{grid-column:auto}.toolbar{align-items:flex-start;flex-direction:column}.menu-item{grid-template-columns:58px minmax(0,1fr)}.menu-item img,.placeholder{width:58px;height:58px}.item-actions{grid-column:2;justify-content:flex-start}.price{margin-right:auto}}
@@ -84,9 +85,12 @@ textarea{resize:vertical;min-height:84px}
           <label>Price (GH₵)<input id="item-price" type="number" min="0.01" max="100000" step="0.01" required></label>
           <label>Badge (optional)<input id="item-tag" maxlength="40" placeholder="Chef's pick"></label>
           <label class="wide">Description<textarea id="item-description" maxlength="400" required></textarea></label>
+          <label class="wide">Choose a photo from your computer<input id="item-file" type="file" accept="image/jpeg,image/png,image/webp"></label>
           <label class="wide">Photo path or HTTPS URL<input id="item-image" maxlength="2048" placeholder="assets/food/fried-rice-chicken.jpg"></label>
         </div>
-        <p class="hint">For an existing site photo, use its path under <code>assets/food/</code>. External photos must use HTTPS.</p>
+        <p class="hint">Choose a photo or enter an existing site path/HTTPS URL. Uploaded photos are compressed and stored with the menu in Firestore (max 800 KB per image).</p>
+        <img id="photo-preview" class="photo-preview" alt="Dish photo preview" hidden>
+        <p class="status" id="photo-status" role="status" aria-live="polite"></p>
         <div class="actions"><button class="btn" id="save-item" type="submit">Add dish</button><button class="btn secondary" id="cancel-edit" type="button" hidden>Cancel edit</button></div>
       </form>
     </section>
@@ -101,6 +105,12 @@ textarea{resize:vertical;min-height:84px}
 const $ = id => document.getElementById(id);
 const emailAllowed = String(window.ADMIN_EMAIL || "").toLowerCase();
 let auth, db, currentUser, unsubscribeMenu, menuItems = [];
+let selectedPhotoData = "";
+let photoProcessing = Promise.resolve("");
+let photoSelectionToken = 0;
+
+const MAX_IMAGE_DATA_URL_LENGTH = 800000;
+const MAX_SOURCE_IMAGE_BYTES = 20 * 1024 * 1024;
 
 function showStatus(element, message, isError = false) {
   element.textContent = message;
@@ -111,7 +121,50 @@ function safePhoto(value) {
   const src = String(value || "").trim();
   if (/^assets\/food\/[a-z0-9._/-]+$/i.test(src) && !src.split("/").includes("..")) return src;
   if (/^https:\/\/[^\s"'<>]+$/i.test(src)) return src;
+  if (src.length <= MAX_IMAGE_DATA_URL_LENGTH && /^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(src)) return src;
   return "";
+}
+
+async function compressPhoto(file) {
+  if (!file.type.startsWith("image/")) throw new Error("Choose a valid image file.");
+  if (file.size > MAX_SOURCE_IMAGE_BYTES) throw new Error("Choose an image smaller than 20 MB.");
+  if (typeof createImageBitmap !== "function") throw new Error("This browser cannot prepare image uploads.");
+
+  const bitmap = await createImageBitmap(file);
+  try {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Could not prepare this image. Try another photo.");
+
+    let width = Math.min(bitmap.width, 1200);
+    let height = Math.max(1, Math.round(bitmap.height * width / bitmap.width));
+    for (let sizeAttempt = 0; sizeAttempt < 6; sizeAttempt++) {
+      canvas.width = width;
+      canvas.height = height;
+      context.fillStyle = "#fff";
+      context.fillRect(0, 0, width, height);
+      context.drawImage(bitmap, 0, 0, width, height);
+      for (const quality of [0.82, 0.72, 0.62, 0.52]) {
+        const dataUrl = canvas.toDataURL("image/jpeg", quality);
+        if (dataUrl.length <= MAX_IMAGE_DATA_URL_LENGTH) return dataUrl;
+      }
+      width = Math.max(1, Math.floor(width * 0.82));
+      height = Math.max(1, Math.floor(height * 0.82));
+    }
+    throw new Error("This photo is still too large after compression. Choose a smaller image.");
+  } finally {
+    bitmap.close();
+  }
+}
+
+function clearPhotoSelection() {
+  $("item-file").value = "";
+  selectedPhotoData = "";
+  photoProcessing = Promise.resolve("");
+  photoSelectionToken++;
+  $("photo-preview").removeAttribute("src");
+  $("photo-preview").hidden = true;
+  showStatus($("photo-status"), "");
 }
 
 function slugify(value) {
@@ -120,13 +173,20 @@ function slugify(value) {
 }
 
 function setEditing(item) {
+  clearPhotoSelection();
   $("item-key").value = item ? item.k : "";
   $("item-name").value = item ? item.n : "";
   $("item-category").value = item ? item.c : "Mains";
   $("item-price").value = item ? item.p : "";
   $("item-tag").value = item && item.t ? item.t : "";
   $("item-description").value = item ? item.d : "";
-  $("item-image").value = item ? (item.image || "") : "";
+  $("item-image").value = item && typeof item.image === "string" && !item.image.startsWith("data:image/")
+    ? item.image : "";
+  const image = safePhoto(item && item.image);
+  if (image) {
+    $("photo-preview").src = image;
+    $("photo-preview").hidden = false;
+  }
   $("form-title").textContent = item ? "Edit dish" : "Add a dish";
   $("save-item").textContent = item ? "Save changes" : "Add dish";
   $("cancel-edit").hidden = !item;
@@ -237,6 +297,45 @@ try {
 
   $("sign-out").addEventListener("click", () => authSdk.signOut(auth));
 
+  $("item-file").addEventListener("change", () => {
+    const file = $("item-file").files && $("item-file").files[0];
+    const selectionToken = ++photoSelectionToken;
+    selectedPhotoData = "";
+    $("photo-preview").removeAttribute("src");
+    $("photo-preview").hidden = true;
+    showStatus($("photo-status"), "");
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      $("item-file").value = "";
+      showStatus($("photo-status"), "Choose a valid image file.", true);
+      return;
+    }
+    if (file.size > MAX_SOURCE_IMAGE_BYTES) {
+      $("item-file").value = "";
+      showStatus($("photo-status"), "Choose an image smaller than 20 MB.", true);
+      return;
+    }
+    $("item-image").value = "";
+    showStatus($("photo-status"), "Compressing photo…");
+    photoProcessing = compressPhoto(file).then(dataUrl => {
+      if (selectionToken !== photoSelectionToken) return "";
+      selectedPhotoData = dataUrl;
+      $("photo-preview").src = dataUrl;
+      $("photo-preview").hidden = false;
+      showStatus($("photo-status"), `Photo ready for Firestore (${Math.ceil(dataUrl.length / 1024)} KB).`);
+      return dataUrl;
+    }).catch(error => {
+      if (selectionToken === photoSelectionToken) {
+        showStatus($("photo-status"), error && error.message ? error.message : "Could not prepare this photo.", true);
+      }
+      return "";
+    });
+  });
+
+  $("item-image").addEventListener("input", () => {
+    if ($("item-image").value.trim()) clearPhotoSelection();
+  });
+
   authSdk.onAuthStateChanged(auth, async user => {
     currentUser = user;
     const authorized = Boolean(user && user.email && user.email.toLowerCase() === emailAllowed && user.emailVerified);
@@ -267,16 +366,19 @@ try {
     const name = $("item-name").value.trim();
     const key = originalKey || slugify(name);
     const price = Number($("item-price").value);
-    const image = safePhoto($("item-image").value);
+    const imageInput = $("item-image").value.trim();
+    const selectedFile = $("item-file").files && $("item-file").files[0];
+    let image = safePhoto(imageInput);
     if (!key || !name || !Number.isFinite(price) || price <= 0) {
       showStatus($("admin-status"), "Enter a dish name and a valid price greater than zero.", true);
       return;
     }
-    if ($("item-image").value.trim() && !image) {
+    if (imageInput && !image) {
       showStatus($("admin-status"), "Use a path under assets/food/ or a valid HTTPS image URL.", true);
       return;
     }
     const currentItem = menuItems.find(item => item.k === originalKey);
+    if (!selectedFile && !image && currentItem) image = currentItem.image || "";
     const data = {
       c: $("item-category").value,
       k: key,
@@ -290,7 +392,14 @@ try {
     if (tag) data.t = tag;
     const saveButton = $("save-item");
     saveButton.disabled = true;
+    $("item-file").disabled = true;
+    $("item-image").disabled = true;
     try {
+      if (selectedFile) {
+        image = await photoProcessing;
+        if (!image) throw new Error("Wait for the selected photo to finish compressing, or choose another image.");
+      }
+      data.image = image;
       const itemRef = firestoreSdk.doc(db, "menu", key);
       if (!originalKey && (await firestoreSdk.getDoc(itemRef)).exists()) {
         throw new Error("A dish with this name already exists. Edit the existing item instead.");
@@ -302,6 +411,8 @@ try {
       showStatus($("admin-status"), friendlyError(error), true);
     } finally {
       saveButton.disabled = false;
+      $("item-file").disabled = false;
+      $("item-image").disabled = false;
     }
   });
 

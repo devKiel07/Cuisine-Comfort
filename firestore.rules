@@ -25,7 +25,7 @@ service cloud.firestore {
         && data.p > 0
         && data.p <= 100000
         && (!data.keys().hasAny(['t']) || (data.t is string && data.t.size() <= 40))
-        && (!data.keys().hasAny(['image']) || (data.image is string && data.image.size() <= 2048))
+        && (!data.keys().hasAny(['image']) || (data.image is string && data.image.size() <= 800000))
         && (!data.keys().hasAny(['sortOrder']) || data.sortOrder is number);
     }
 
