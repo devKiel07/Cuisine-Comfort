@@ -59,7 +59,7 @@ textarea{resize:vertical;min-height:84px}
   <div class="intro"><h1>Menu admin</h1><p>Sign in to manage dishes and prices. Changes are shared with visitors through Firebase.</p></div>
   <section class="panel" id="login-panel" aria-labelledby="login-title">
     <h2 id="login-title">Admin sign in</h2>
-    <p class="hint">Use the verified Firebase account <strong id="admin-email-label"></strong>. Create the account in Firebase Authentication first if needed.</p>
+    <p class="hint">Sign in with your verified Firebase admin account.</p>
     <form id="login-form" class="form-grid">
       <label>Email<input id="email" type="email" autocomplete="username" required></label>
       <label>Password<input id="password" type="password" autocomplete="current-password" required></label>
@@ -100,8 +100,6 @@ textarea{resize:vertical;min-height:84px}
 <script type="module">
 const $ = id => document.getElementById(id);
 const emailAllowed = String(window.ADMIN_EMAIL || "").toLowerCase();
-$("admin-email-label").textContent = emailAllowed;
-$("email").value = emailAllowed;
 let auth, db, currentUser, unsubscribeMenu, menuItems = [];
 
 function showStatus(element, message, isError = false) {
@@ -251,7 +249,7 @@ try {
       return;
     }
     if (!user.email || user.email.toLowerCase() !== emailAllowed) {
-      showStatus($("login-status"), `This account is not authorized. Sign in as ${emailAllowed}.`, true);
+      showStatus($("login-status"), "This account is not authorized to manage the menu.", true);
       await authSdk.signOut(auth);
       return;
     }
